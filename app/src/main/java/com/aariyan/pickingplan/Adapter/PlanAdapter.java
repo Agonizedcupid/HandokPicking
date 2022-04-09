@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aariyan.pickingplan.Constant.Constant;
 import com.aariyan.pickingplan.Interface.ToLoadClick;
 import com.aariyan.pickingplan.Model.PlanModel;
 import com.aariyan.pickingplan.R;
@@ -27,7 +28,7 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.ViewHolder> {
     ToLoadClick toLoadClick;
     private String from;
 
-    public PlanAdapter(Context context, List<PlanModel> list, ToLoadClick toLoadClick,String from) {
+    public PlanAdapter(Context context, List<PlanModel> list, ToLoadClick toLoadClick, String from) {
         this.context = context;
         this.list = list;
         this.toLoadClick = toLoadClick;
@@ -104,8 +105,11 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.ViewHolder> {
         holder.toLoad.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                toLoadClick.onClick(model);
+                if (!from.equals(Constant.fromInvoice)) {
+                    toLoadClick.onClick(model);
+                }
             }
+
         });
 
     }

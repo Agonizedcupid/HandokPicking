@@ -76,6 +76,8 @@ public class PlanActivity extends AppCompatActivity implements ToLoadClick {
     private CompositeDisposable invoiceDisposable = new CompositeDisposable();
 
     private RestApis apis;
+
+    private String oldOrNew = "old";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,12 +102,14 @@ public class PlanActivity extends AppCompatActivity implements ToLoadClick {
             }
             if (getIntent().hasExtra(Constant.LONG_CLICK)) {
                 if (isLongClicked.equals(Constant.YES)) {
+                    oldOrNew = "new";
                     loadInvoice(qrCode);
                     invoiceBtn.setVisibility(View.VISIBLE);
                     extrasBtn.setVisibility(View.GONE);
                     submitBtn.setVisibility(View.GONE);
                 }
             } else {
+                oldOrNew = "old";
                 loadPlan(qrCode);
                 invoiceBtn.setVisibility(View.GONE);
                 submitBtn.setVisibility(View.VISIBLE);

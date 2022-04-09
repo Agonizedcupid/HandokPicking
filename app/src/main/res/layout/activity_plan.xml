@@ -142,6 +142,7 @@
                 android:layout_marginTop="10dp"
                 android:text="Extras"
                 android:textSize="12sp"
+                android:visibility="gone"
                 app:layout_constraintLeft_creator="1"
                 app:layout_constraintLeft_toRightOf="@id/referenceTxtView"
                 app:layout_constraintRight_creator="1"
