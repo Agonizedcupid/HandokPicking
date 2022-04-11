@@ -14,6 +14,9 @@
         android:theme="@style/Theme.PickingPlan"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".InvoiceActivity"
+            android:exported="false" />
+        <activity
             android:name=".ExtrasActivity"
             android:exported="false" />
         <activity

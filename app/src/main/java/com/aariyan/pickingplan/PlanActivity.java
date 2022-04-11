@@ -103,7 +103,7 @@ public class PlanActivity extends AppCompatActivity implements ToLoadClick {
             if (getIntent().hasExtra(Constant.LONG_CLICK)) {
                 if (isLongClicked.equals(Constant.YES)) {
                     oldOrNew = "new";
-                    loadInvoice(qrCode);
+                    //loadInvoice(qrCode);
                     invoiceBtn.setVisibility(View.VISIBLE);
                     extrasBtn.setVisibility(View.GONE);
                     submitBtn.setVisibility(View.GONE);
@@ -119,30 +119,30 @@ public class PlanActivity extends AppCompatActivity implements ToLoadClick {
         }
     }
 
-    private void loadInvoice(String qrCode) {
-        NetworkingFeedback feedback = new NetworkingFeedback(PlanActivity.this, PlanActivity.this);
-        feedback.getInvoice(new GetPLanInterface() {
-            @Override
-            public void gotPlan(List<PlanModel> listOfPlan) {
-                if (listOfPlan.size() > 0) {
-                    adapter = new PlanAdapter(PlanActivity.this, listOfPlan, PlanActivity.this, Constant.fromInvoice);
-                    recyclerView.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
-                    referenceNo.setText("Reference: " + listOfPlan.get(0).getReference());
-                } else {
-                    Snackbar.make(snackBarLayout, "No data found!", Snackbar.LENGTH_SHORT).show();
-                    //Toast.makeText(PlanActivity.this, "No Data found!", Toast.LENGTH_SHORT).show();
-                }
-                progressBar.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void error(String errorMessage) {
-                Snackbar.make(snackBarLayout, "" + errorMessage, Snackbar.LENGTH_SHORT).show();
-                progressBar.setVisibility(View.GONE);
-            }
-        }, qrCode, snackBarLayout);
-    }
+//    private void loadInvoice(String qrCode) {
+//        NetworkingFeedback feedback = new NetworkingFeedback(PlanActivity.this, PlanActivity.this);
+//        feedback.getInvoice(new GetPLanInterface() {
+//            @Override
+//            public void gotPlan(List<PlanModel> listOfPlan) {
+//                if (listOfPlan.size() > 0) {
+//                    adapter = new PlanAdapter(PlanActivity.this, listOfPlan, PlanActivity.this, Constant.fromInvoice);
+//                    recyclerView.setAdapter(adapter);
+//                    adapter.notifyDataSetChanged();
+//                    referenceNo.setText("Reference: " + listOfPlan.get(0).getReference());
+//                } else {
+//                    Snackbar.make(snackBarLayout, "No data found!", Snackbar.LENGTH_SHORT).show();
+//                    //Toast.makeText(PlanActivity.this, "No Data found!", Toast.LENGTH_SHORT).show();
+//                }
+//                progressBar.setVisibility(View.GONE);
+//            }
+//
+//            @Override
+//            public void error(String errorMessage) {
+//                Snackbar.make(snackBarLayout, "" + errorMessage, Snackbar.LENGTH_SHORT).show();
+//                progressBar.setVisibility(View.GONE);
+//            }
+//        }, qrCode, snackBarLayout);
+//    }
 
     private void loadPlan(String qrCode) {
         NetworkingFeedback feedback = new NetworkingFeedback(PlanActivity.this, PlanActivity.this);

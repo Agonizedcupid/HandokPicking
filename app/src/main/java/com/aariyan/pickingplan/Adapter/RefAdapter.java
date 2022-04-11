@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.aariyan.pickingplan.BarcodeActivity;
 import com.aariyan.pickingplan.Constant.Constant;
+import com.aariyan.pickingplan.InvoiceActivity;
 import com.aariyan.pickingplan.Model.RefModel;
 import com.aariyan.pickingplan.PlanActivity;
 import com.aariyan.pickingplan.R;
@@ -69,7 +70,7 @@ public class RefAdapter extends RecyclerView.Adapter<RefAdapter.ViewHolder> {
         dialog.setButton(DialogInterface.BUTTON_POSITIVE, "YES", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Intent intent = new Intent(context, PlanActivity.class);
+                Intent intent = new Intent(context, InvoiceActivity.class);
                 intent.putExtra("qrCode", qrCode);
                 intent.putExtra(Constant.LONG_CLICK,Constant.YES);
                 context.startActivity(intent);

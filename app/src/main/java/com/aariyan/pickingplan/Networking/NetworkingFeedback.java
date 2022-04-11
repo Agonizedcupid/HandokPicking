@@ -348,7 +348,7 @@ public class NetworkingFeedback {
         }
     }
 
-    public void getInvoice(GetPLanInterface getPLanInterface, String qrCode, CoordinatorLayout snackBarLayout) {
+    public void getInvoice(GetPLanInterface getPLanInterface, String qrCode, ConstraintLayout snackBarLayout) {
         Log.d("TESTING_URL", "" + Constant.BASE_URL);
         listOfPlans.clear();
         compositeDisposable.add(apis.getPlan(qrCode)
@@ -385,7 +385,7 @@ public class NetworkingFeedback {
                             listOfPlans.add(model);
                         }
                         getPLanInterface.gotPlan(listOfPlans);
-                        insertIntoSqliteDatabase(listOfPlans, qrCode, snackBarLayout);
+                        //insertIntoSqliteDatabase(listOfPlans, qrCode, snackBarLayout);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
