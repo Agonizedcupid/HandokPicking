@@ -78,6 +78,7 @@ public class PlanActivity extends AppCompatActivity implements ToLoadClick {
     private RestApis apis;
 
     private String oldOrNew = "old";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -213,7 +214,10 @@ public class PlanActivity extends AppCompatActivity implements ToLoadClick {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(PlanActivity.this, ExtrasActivity.class)
-                        .putExtra("code", qrCode));
+                        .putExtra("code", qrCode)
+                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             }
         });
 
@@ -281,26 +285,26 @@ public class PlanActivity extends AppCompatActivity implements ToLoadClick {
     }
 
     private void submitInvoice() {
-        invoiceDisposable.add(apis.processInvoice(qrCode,getIntent().getIntExtra("userId", 0))
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Consumer<ResponseBody>() {
-            @Override
-            public void accept(ResponseBody responseBody) throws Throwable {
-                JSONArray root = new JSONArray(responseBody.string());
-                JSONObject single = root.getJSONObject(0);
-                String result = single.getString("result");
-                Toast.makeText(PlanActivity.this, ""+result, Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(PlanActivity.this, BarcodeActivity.class)
-                        .putExtra("userId", getIntent().getIntExtra("userId", 0)));
-                databaseAdapter.dropRefTable();
-            }
-        }, new Consumer<Throwable>() {
-            @Override
-            public void accept(Throwable throwable) throws Throwable {
-                Toast.makeText(PlanActivity.this, ""+throwable.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        }));
+        invoiceDisposable.add(apis.processInvoice(qrCode, getIntent().getIntExtra("userId", 0))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<ResponseBody>() {
+                    @Override
+                    public void accept(ResponseBody responseBody) throws Throwable {
+                        JSONArray root = new JSONArray(responseBody.string());
+                        JSONObject single = root.getJSONObject(0);
+                        String result = single.getString("result");
+                        Toast.makeText(PlanActivity.this, "" + result, Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(PlanActivity.this, BarcodeActivity.class)
+                                .putExtra("userId", getIntent().getIntExtra("userId", 0)));
+                        databaseAdapter.dropRefTable();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Throwable {
+                        Toast.makeText(PlanActivity.this, "" + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }));
     }
 
 //    private void loadFilteredData(int flag) {

@@ -42,7 +42,7 @@ public class InvoiceActivity extends AppCompatActivity {
 
     private InvoiceAdapter adapter;
 
-    private Button  invoiceBtn;
+    private Button invoiceBtn;
     private String qrCode = "";
     RestApis apis;
 
@@ -115,7 +115,7 @@ public class InvoiceActivity extends AppCompatActivity {
     }
 
     private void submitInvoice() {
-        invoiceDisposable.add(apis.processInvoice(qrCode,getIntent().getIntExtra("userId", 0))
+        invoiceDisposable.add(apis.processInvoice(qrCode, getIntent().getIntExtra("userId", 0))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<ResponseBody>() {
@@ -124,18 +124,20 @@ public class InvoiceActivity extends AppCompatActivity {
                         JSONArray root = new JSONArray(responseBody.string());
                         JSONObject single = root.getJSONObject(0);
                         String result = single.getString("result");
-                        Toast.makeText(InvoiceActivity.this, ""+result, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(InvoiceActivity.this, "" + result, Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(InvoiceActivity.this, MainActivity.class)
                                 .putExtra("userId", getIntent().getIntExtra("userId", 0))
-                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        );
                         finish();
                         databaseAdapter.dropRefTable();
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Throwable {
-                        Toast.makeText(InvoiceActivity.this, ""+throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(InvoiceActivity.this, "" + throwable.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }));
     }

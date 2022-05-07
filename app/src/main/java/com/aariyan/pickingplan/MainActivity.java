@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -173,6 +175,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        Toast.makeText(this, "Called", Toast.LENGTH_SHORT).show();
+        finish();
+//        startActivity(new Intent(BarcodeActivity.this, MainActivity.class)
+//                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+//                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+        //super.onBackPressed();
+    }
+
     //Checking the log-In validation whether the entered data is correct or not:
     private void logInValidation() {
         progressBar.setVisibility(View.VISIBLE);
@@ -189,28 +201,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             progressBar.setVisibility(View.GONE);
             return;
         }
+        new AlertDialog.Builder(MainActivity.this)
+                .setTitle("Ensure your IP")
+                .setMessage(Constant.BASE_URL)
+                .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
 
-        NetworkingFeedback networking = new NetworkingFeedback(MainActivity.this, MainActivity.this);
-        networking.postLogInResponse(new LogInInterface() {
-            @Override
-            public void checkLogIn(List<AuthenticationModel> list) {
-                if (list.size() > 0) {
-                    Intent barcodeIntent = new Intent(MainActivity.this, BarcodeActivity.class);
-                    barcodeIntent.putExtra("name", list.get(0).getPickingTeams());
-                    barcodeIntent.putExtra("userId", list.get(0).getUserID());
-                    startActivity(barcodeIntent);
-                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                } else {
-                    Snackbar.make(snackBarLayout, "Invalid Credential!", Snackbar.LENGTH_SHORT).show();
-                }
-                progressBar.setVisibility(View.GONE);
-            }
+                        NetworkingFeedback networking = new NetworkingFeedback(MainActivity.this, MainActivity.this);
+                        networking.postLogInResponse(new LogInInterface() {
+                            @Override
+                            public void checkLogIn(List<AuthenticationModel> list) {
+                                if (list.size() > 0) {
+                                    Intent barcodeIntent = new Intent(MainActivity.this, BarcodeActivity.class);
+                                    barcodeIntent.putExtra("name", list.get(0).getPickingTeams());
+                                    barcodeIntent.putExtra("userId", list.get(0).getUserID());
+                                    startActivity(barcodeIntent);
+                                    dialogInterface.dismiss();
+                                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                                } else {
+                                    Snackbar.make(snackBarLayout, "Invalid Credential!", Snackbar.LENGTH_SHORT).show();
+                                }
+                                progressBar.setVisibility(View.GONE);
+                            }
 
-            @Override
-            public void onError(String errorMessage) {
-                Snackbar.make(snackBarLayout, "" + errorMessage, Snackbar.LENGTH_SHORT).show();
-                progressBar.setVisibility(View.GONE);
-            }
-        }, enteredPinCode);
+                            @Override
+                            public void onError(String errorMessage) {
+                                Snackbar.make(snackBarLayout, "" + errorMessage, Snackbar.LENGTH_SHORT).show();
+                                progressBar.setVisibility(View.GONE);
+                            }
+                        }, enteredPinCode);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        progressBar.setVisibility(View.GONE);
+                    }
+                })
+                .create()
+                .show();
     }
 }

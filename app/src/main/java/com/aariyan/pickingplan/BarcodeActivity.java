@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +46,8 @@ public class BarcodeActivity extends AppCompatActivity {
 
     private ProgressBar progressBar;
 
+    private ImageView backPressed;
+
     public static String name = "";
     public static int userId = 0;
 
@@ -63,13 +66,6 @@ public class BarcodeActivity extends AppCompatActivity {
         initUI(savedInstanceState);
     }
 
-    @Override
-    public void onBackPressed() {
-        startActivity(new Intent(BarcodeActivity.this, MainActivity.class)
-                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-        super.onBackPressed();
-    }
 
     private void initUI(Bundle savedInstanceState) {
         snackBarLayout = findViewById(R.id.snackBarLayout);
@@ -79,6 +75,14 @@ public class BarcodeActivity extends AppCompatActivity {
         continueWithMyPlay = findViewById(R.id.continueWithMyPLan);
 
         progressBar = findViewById(R.id.pBar);
+        backPressed = findViewById(R.id.backPressed);
+        backPressed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(BarcodeActivity.this, MainActivity.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            }
+        });
 
         recyclerView = findViewById(R.id.refRecyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));

@@ -276,7 +276,8 @@ public class ExtrasActivity extends AppCompatActivity {
                     JSONObject single = root.getJSONObject(0);
                     String result = single.getString("result");
                     Toast.makeText(ExtrasActivity.this, "" + result, Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(ExtrasActivity.this, BarcodeActivity.class)
+                   //startActivity(new Intent(ExtrasActivity.this, BarcodeActivity.class)
+                    startActivity(new Intent(ExtrasActivity.this, MainActivity.class)
                             .putExtra("userId", Constant.usrId));
                     saveBtn.setEnabled(true);
                     progressBar.setVisibility(View.GONE);

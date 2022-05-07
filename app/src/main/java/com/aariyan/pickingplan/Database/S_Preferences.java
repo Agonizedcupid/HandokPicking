@@ -17,11 +17,11 @@ public class S_Preferences {
         sharedPreferences = context.getSharedPreferences(rootName, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("BASE_URL", valueOrUrl);
-        editor.commit();
+        editor.apply();
     }
 
 
-    public  String getBaseUrl(String rootName) {
+    public String getBaseUrl(String rootName) {
         sharedPreferences = context.getSharedPreferences(rootName, Context.MODE_PRIVATE);
         return sharedPreferences.getString("BASE_URL", DEFAULT_URL);
     }

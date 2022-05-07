@@ -493,10 +493,15 @@ public class NetworkingFeedback {
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        context.startActivity(new Intent(context, BarcodeActivity.class)
-                                //.putExtra("qrCode", "nothing")
+//                        context.startActivity(new Intent(context, BarcodeActivity.class)
+//                                //.putExtra("qrCode", "nothing")
+//                                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+//                                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                        context.startActivity(new Intent(context, MainActivity.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                        Toast.makeText(context, "Data posted successfully", Toast.LENGTH_SHORT).show();
                         databaseAdapter.dropPlanTable();
                         Snackbar.make(snackBarLayout, "Data posted successfully", Snackbar.LENGTH_SHORT).show();
                     }
