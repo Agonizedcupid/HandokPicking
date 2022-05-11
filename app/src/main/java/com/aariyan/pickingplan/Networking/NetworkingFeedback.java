@@ -84,53 +84,88 @@ public class NetworkingFeedback {
 
     public void getReferenceFromServer(int id, RefInterface refInterface) {
         listOfRef.clear();
-        listOfRef = databaseAdapter.getRefById(id);
-        if (listOfRef.size() > 0) {
-            refInterface.onSuccess(listOfRef);
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(context, "Showing from local database", Toast.LENGTH_SHORT).show();
-                }
-            });
-            return;
-        } else {
-            databaseAdapter.dropRefTable();
-            refDisposable.add(apis.getReference(id)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Consumer<ResponseBody>() {
-                        @Override
-                        public void accept(ResponseBody responseBody) throws Throwable {
-                            JSONArray root = new JSONArray(responseBody.string());
+        databaseAdapter.dropRefTable();
+        refDisposable.add(apis.getReference(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<ResponseBody>() {
+                    @Override
+                    public void accept(ResponseBody responseBody) throws Throwable {
+                        JSONArray root = new JSONArray(responseBody.string());
 //                            Log.d("RESPONSES", responseBody.string());
 //                            Log.d("RESPONSES",root.toString());
-                            if (root.length() > 0) {
-                                listOfRef.clear();
-                                for (int i = 0; i < root.length(); i++) {
-                                    JSONObject single = root.getJSONObject(i);
-                                    int intAutoPickingHeader = single.getInt("intAutoPickingHeader");
-                                    String strUnickReference = single.getString("strUnickReference");
-                                    String strPickingNickname = single.getString("strPickingNickname");
+                        if (root.length() > 0) {
+                            listOfRef.clear();
+                            for (int i = 0; i < root.length(); i++) {
+                                JSONObject single = root.getJSONObject(i);
+                                int intAutoPickingHeader = single.getInt("intAutoPickingHeader");
+                                String strUnickReference = single.getString("strUnickReference");
+                                String strPickingNickname = single.getString("strPickingNickname");
 
-                                    RefModel model = new RefModel(intAutoPickingHeader, strUnickReference, strPickingNickname);
-                                    listOfRef.add(model);
+                                RefModel model = new RefModel(intAutoPickingHeader, strUnickReference, strPickingNickname);
+                                listOfRef.add(model);
 
-                                }
-                                refInterface.onSuccess(listOfRef);
-                                insertRef(listOfRef, id);
-
-                            } else {
-                                refInterface.onError("No Reference Found!");
                             }
+                            refInterface.onSuccess(listOfRef);
+                            insertRef(listOfRef, id);
+
+                        } else {
+                            refInterface.onError("No Reference Found!");
                         }
-                    }, new Consumer<Throwable>() {
-                        @Override
-                        public void accept(Throwable throwable) throws Throwable {
-                            refInterface.onError("" + throwable.getMessage());
-                        }
-                    }));
-        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Throwable {
+                        refInterface.onError("" + throwable.getMessage());
+                    }
+                }));
+//        listOfRef = databaseAdapter.getRefById(id);
+//        if (listOfRef.size() > 0) {
+//            refInterface.onSuccess(listOfRef);
+//            activity.runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Toast.makeText(context, "Showing from local database", Toast.LENGTH_SHORT).show();
+//                }
+//            });
+//            return;
+//        } else {
+//            databaseAdapter.dropRefTable();
+//            refDisposable.add(apis.getReference(id)
+//                    .subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe(new Consumer<ResponseBody>() {
+//                        @Override
+//                        public void accept(ResponseBody responseBody) throws Throwable {
+//                            JSONArray root = new JSONArray(responseBody.string());
+////                            Log.d("RESPONSES", responseBody.string());
+////                            Log.d("RESPONSES",root.toString());
+//                            if (root.length() > 0) {
+//                                listOfRef.clear();
+//                                for (int i = 0; i < root.length(); i++) {
+//                                    JSONObject single = root.getJSONObject(i);
+//                                    int intAutoPickingHeader = single.getInt("intAutoPickingHeader");
+//                                    String strUnickReference = single.getString("strUnickReference");
+//                                    String strPickingNickname = single.getString("strPickingNickname");
+//
+//                                    RefModel model = new RefModel(intAutoPickingHeader, strUnickReference, strPickingNickname);
+//                                    listOfRef.add(model);
+//
+//                                }
+//                                refInterface.onSuccess(listOfRef);
+//                                insertRef(listOfRef, id);
+//
+//                            } else {
+//                                refInterface.onError("No Reference Found!");
+//                            }
+//                        }
+//                    }, new Consumer<Throwable>() {
+//                        @Override
+//                        public void accept(Throwable throwable) throws Throwable {
+//                            refInterface.onError("" + throwable.getMessage());
+//                        }
+//                    }));
+//        }
     }
 
     public void postLogInResponse(LogInInterface logInInterface, String pinCode) {
