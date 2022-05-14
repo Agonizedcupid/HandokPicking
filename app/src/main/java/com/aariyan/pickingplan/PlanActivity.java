@@ -79,6 +79,8 @@ public class PlanActivity extends AppCompatActivity implements ToLoadClick {
 
     private String oldOrNew = "old";
 
+    private TextView quantityText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -193,6 +195,7 @@ public class PlanActivity extends AppCompatActivity implements ToLoadClick {
     }
 
     private void initUI() {
+        quantityText = findViewById(R.id.quantityTxt);
 //        showRemainingBtn = findViewById(R.id.showRemainingBtn);
 //        showRemainingBtn.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -352,9 +355,10 @@ public class PlanActivity extends AppCompatActivity implements ToLoadClick {
     }
 
     @Override
-    public void onClick(PlanModel model) {
+    public void onClick(PlanModel model, int position) {
         behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         itemName.setText("Item Name: " + model.getDescription());
+        quantityText.setText("Enter Quantity (" + model.getToLoad() + ")");
         enteredQuantity.setText(model.getToLoad());
         saveQuantityBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -368,6 +372,7 @@ public class PlanActivity extends AppCompatActivity implements ToLoadClick {
 
                 long id = databaseAdapter.updatePlanToLoad(model.getDescription(), qrCode, finalQuantity, model.getStorename(), model.getLineNos(), 1);
                 if (id > 0) {
+                    recyclerView.scrollToPosition(position);
                     Snackbar.make(snackBarLayout, "Updated To " + finalQuantity, Snackbar.LENGTH_SHORT).show();
                     loadPlan("nothing");
                 } else {

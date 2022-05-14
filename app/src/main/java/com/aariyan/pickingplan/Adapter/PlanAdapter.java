@@ -106,7 +106,7 @@ public class PlanAdapter extends RecyclerView.Adapter<PlanAdapter.ViewHolder> {
             @Override
             public void onClick(View view) {
                 if (!from.equals(Constant.fromInvoice)) {
-                    toLoadClick.onClick(model);
+                    toLoadClick.onClick(model, position);
                 }
             }
 
