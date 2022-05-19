@@ -326,7 +326,7 @@ public class NetworkingFeedback {
             listOfPlans = databaseAdapter.getPlans();
             getPLanInterface.gotPlan(listOfPlans);
             if (listOfPlans.size() > 0) {
-                Snackbar.make(snackBarLayout, "Data showing from local storage", Snackbar.LENGTH_SHORT).show();
+                //Snackbar.make(snackBarLayout, "Data showing from local storage", Snackbar.LENGTH_SHORT).show();
             } else {
                 Snackbar.make(snackBarLayout, "No data found!", Snackbar.LENGTH_SHORT).show();
             }
@@ -457,7 +457,7 @@ public class NetworkingFeedback {
 
             @Override
             public void onComplete() {
-                Snackbar.make(snackBarLayout, "Saved on local storage", Snackbar.LENGTH_SHORT).show();
+                //Snackbar.make(snackBarLayout, "Saved on local storage", Snackbar.LENGTH_SHORT).show();
             }
         };
         observable.subscribe(observer);
@@ -538,7 +538,7 @@ public class NetworkingFeedback {
                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                         Toast.makeText(context, "Data posted successfully", Toast.LENGTH_SHORT).show();
                         databaseAdapter.dropPlanTable();
-                        Snackbar.make(snackBarLayout, "Data posted successfully", Snackbar.LENGTH_SHORT).show();
+                        //Snackbar.make(snackBarLayout, "Data posted successfully", Snackbar.LENGTH_SHORT).show();
                     }
                 });
 
@@ -575,7 +575,7 @@ public class NetworkingFeedback {
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(context, "Saved Locally", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, "Saved Locally", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
