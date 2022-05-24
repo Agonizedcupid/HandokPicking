@@ -54,4 +54,10 @@ public interface RestApis {
     @FormUrlEncoded
     @POST("ProcessInvoice.php")
     Observable<ResponseBody> processInvoice(@Field("reference") String reference, @Field("userId") int userId);
+    @GET("GetTickets.php")
+    Observable<ResponseBody> getTicket();
+
+    @GET("GetTrailors.php")
+    Observable<ResponseBody> getTrailor();
+
 }

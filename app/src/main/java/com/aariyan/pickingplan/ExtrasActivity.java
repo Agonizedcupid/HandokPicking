@@ -8,15 +8,20 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.aariyan.pickingplan.Constant.Constant;
+import com.aariyan.pickingplan.Interface.GetTicketInterface;
 import com.aariyan.pickingplan.Interface.RestApis;
 import com.aariyan.pickingplan.Networking.ApiClient;
+import com.aariyan.pickingplan.Networking.NetworkingFeedback;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -30,6 +35,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -52,6 +58,9 @@ public class ExtrasActivity extends AppCompatActivity {
     private RequestQueue requestQueue;
 
     private ProgressBar progressBar;
+
+    private Spinner ticketSpinner, trailorOneSpinner, trailorTwoSpinner;
+    private String ticketString="",trailorOneString = "", trailorTwoString = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +89,10 @@ public class ExtrasActivity extends AppCompatActivity {
         completeYes = findViewById(R.id.yesCompleteBtn);
         completeNo = findViewById(R.id.noCompleteBtn);
         saveBtn = findViewById(R.id.saveBtn);
+
+        ticketSpinner = findViewById(R.id.ticketSpinner);
+        trailorOneSpinner = findViewById(R.id.trailorOneSpinner);
+        trailorTwoSpinner = findViewById(R.id.trailorTwoSpinner);
 
         progressBar = findViewById(R.id.pBar);
 
@@ -123,6 +136,110 @@ public class ExtrasActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 validate();
+            }
+        });
+
+        setUpSpinner();
+
+    }
+
+    private void setUpSpinner() {
+
+        NetworkingFeedback networkingFeedback = new NetworkingFeedback(this, this);
+        networkingFeedback.getTicket(new GetTicketInterface() {
+            @Override
+            public void getTicket(List<String> listOfTicket) {
+                // Creating adapter for spinner
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(ExtrasActivity.this, android.R.layout.simple_spinner_item,listOfTicket);
+
+                // Drop down layout style - list view with radio button
+                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                // attaching data adapter to spinner
+                ticketSpinner.setAdapter(dataAdapter);
+            }
+
+            @Override
+            public void error(String errorMessage) {
+                Toast.makeText(ExtrasActivity.this, ""+errorMessage, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        ticketSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                ticketString = adapterView.getItemAtPosition(i).toString();
+                //Toast.makeText(ExtrasActivity.this, ""+adapterView.getItemAtPosition(i), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        //Trailor One:
+        networkingFeedback.getTrailor(new GetTicketInterface() {
+            @Override
+            public void getTicket(List<String> listOfTrailor) {
+                // Creating adapter for spinner
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(ExtrasActivity.this, android.R.layout.simple_spinner_item,listOfTrailor);
+
+                // Drop down layout style - list view with radio button
+                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                // attaching data adapter to spinner
+                trailorOneSpinner.setAdapter(dataAdapter);
+            }
+
+            @Override
+            public void error(String errorMessage) {
+                Toast.makeText(ExtrasActivity.this, ""+errorMessage, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        trailorOneSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                trailorOneString = adapterView.getItemAtPosition(i).toString();
+                //Toast.makeText(ExtrasActivity.this, ""+adapterView.getItemAtPosition(i), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        networkingFeedback.getTrailor(new GetTicketInterface() {
+            @Override
+            public void getTicket(List<String> listOfTrailor) {
+                // Creating adapter for spinner
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(ExtrasActivity.this, android.R.layout.simple_spinner_item,listOfTrailor);
+
+                // Drop down layout style - list view with radio button
+                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                // attaching data adapter to spinner
+                trailorTwoSpinner.setAdapter(dataAdapter);
+            }
+
+            @Override
+            public void error(String errorMessage) {
+                Toast.makeText(ExtrasActivity.this, ""+errorMessage, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        trailorTwoSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                trailorTwoString = adapterView.getItemAtPosition(i).toString();
+                //Toast.makeText(ExtrasActivity.this, ""+adapterView.getItemAtPosition(i), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
             }
         });
 
@@ -313,6 +430,9 @@ public class ExtrasActivity extends AppCompatActivity {
                 map.put("intNets","" + nets.getText().toString());
                 map.put("strLoadComplete",""+ complete);
                 map.put("strLoadSecured",""+ secure);
+                map.put("trailorone",""+ trailorOneString);
+                map.put("trailortwo",""+ trailorTwoString);
+                map.put("ticket",""+ ticketString);
                 map.put("reference",""+ getIntent().getStringExtra("code"));
                 map.put("userId",""+ Constant.usrId);
                 return map;

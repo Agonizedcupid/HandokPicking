@@ -15,6 +15,7 @@ import com.aariyan.pickingplan.BarcodeActivity;
 import com.aariyan.pickingplan.Constant.Constant;
 import com.aariyan.pickingplan.Database.DatabaseAdapter;
 import com.aariyan.pickingplan.Interface.GetPLanInterface;
+import com.aariyan.pickingplan.Interface.GetTicketInterface;
 import com.aariyan.pickingplan.Interface.LogInInterface;
 import com.aariyan.pickingplan.Interface.RefInterface;
 import com.aariyan.pickingplan.Interface.RestApis;
@@ -69,8 +70,12 @@ public class NetworkingFeedback {
     private Activity activity;
     private RequestQueue requestQueue;
     private List<RefModel> listOfRef = new ArrayList<>();
+    private List<String> listOfTicket = new ArrayList<>();
+    private List<String> listOfTrailor = new ArrayList<>();
 
     CompositeDisposable refDisposable = new CompositeDisposable();
+    private CompositeDisposable ticketDisposable = new CompositeDisposable();
+    private CompositeDisposable trailorDisposable = new CompositeDisposable();
 
     public NetworkingFeedback(Context context, Activity activity) {
         this.context = context;
@@ -581,5 +586,71 @@ public class NetworkingFeedback {
             }
         };
         observable.subscribe(observer);
+    }
+
+    //get Ticket:
+    public void getTicket(GetTicketInterface ticketInterface) {
+        listOfTicket.clear();
+        ticketDisposable.add(apis.getTicket()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<ResponseBody>() {
+                    @Override
+                    public void accept(ResponseBody responseBody) throws Throwable {
+                        JSONArray root = new JSONArray(responseBody.string());
+//                            Log.d("RESPONSES", responseBody.string());
+//                            Log.d("RESPONSES",root.toString());
+                        if (root.length() > 0) {
+                            listOfTicket.clear();
+                            for (int i = 0; i < root.length(); i++) {
+                                JSONObject single = root.getJSONObject(i);
+                                String ticketNumber = single.getString("TICKET_NUMBER");
+                                listOfTicket.add(ticketNumber);
+                            }
+                            ticketInterface.getTicket(listOfTicket);
+                        } else {
+                            Log.d("Network Error", "accept: Network error");
+                            ticketInterface.error("No data found!");
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Throwable {
+                        ticketInterface.error(throwable.getMessage());
+                    }
+                }));
+    }
+
+    //get Ticket:
+    public void getTrailor(GetTicketInterface ticketInterface) {
+        listOfTrailor.clear();
+        trailorDisposable.add(apis.getTrailor()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<ResponseBody>() {
+                    @Override
+                    public void accept(ResponseBody responseBody) throws Throwable {
+                        JSONArray root = new JSONArray(responseBody.string());
+//                            Log.d("RESPONSES", responseBody.string());
+//                            Log.d("RESPONSES",root.toString());
+                        if (root.length() > 0) {
+                            listOfTrailor.clear();
+                            for (int i = 0; i < root.length(); i++) {
+                                JSONObject single = root.getJSONObject(i);
+                                String ticketNumber = single.getString("trailor");
+                                listOfTrailor.add(ticketNumber);
+                            }
+                            ticketInterface.getTicket(listOfTrailor);
+                        } else {
+                            Log.d("Network Error", "accept: Network error");
+                            ticketInterface.error("No data found!");
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Throwable {
+                        ticketInterface.error(throwable.getMessage());
+                    }
+                }));
     }
 }
