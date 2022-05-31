@@ -68,7 +68,7 @@ public class NetworkingFeedback {
     private List<PlanModel> listOfPlans;
     DatabaseAdapter databaseAdapter;
     private Activity activity;
-    private RequestQueue requestQueue;
+    private RequestQueue requestQueue, extraRequestQueue, ticketRequestQueue;
     private List<RefModel> listOfRef = new ArrayList<>();
     private List<String> listOfTicket = new ArrayList<>();
     private List<String> listOfTrailor = new ArrayList<>();
@@ -76,6 +76,7 @@ public class NetworkingFeedback {
     CompositeDisposable refDisposable = new CompositeDisposable();
     private CompositeDisposable ticketDisposable = new CompositeDisposable();
     private CompositeDisposable trailorDisposable = new CompositeDisposable();
+
 
     public NetworkingFeedback(Context context, Activity activity) {
         this.context = context;
@@ -85,6 +86,8 @@ public class NetworkingFeedback {
         databaseAdapter = new DatabaseAdapter(context);
         this.activity = activity;
         requestQueue = Volley.newRequestQueue(context);
+        extraRequestQueue = Volley.newRequestQueue(context);
+        ticketRequestQueue = Volley.newRequestQueue(context);
     }
 
     public void getReferenceFromServer(int id, RefInterface refInterface) {
@@ -588,69 +591,154 @@ public class NetworkingFeedback {
         observable.subscribe(observer);
     }
 
-    //get Ticket:
+    //get Ticket By Retrofit:
+//    public void getTicket(GetTicketInterface ticketInterface) {
+//        listOfTicket.clear();
+//        ticketDisposable.add(apis.getTicket()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Consumer<ResponseBody>() {
+//                    @Override
+//                    public void accept(ResponseBody responseBody) throws Throwable {
+//                        JSONArray root = new JSONArray(responseBody.string());
+////                            Log.d("RESPONSES", responseBody.string());
+////                            Log.d("RESPONSES",root.toString());
+//                        if (root.length() > 0) {
+//                            listOfTicket.clear();
+//                            for (int i = 0; i < root.length(); i++) {
+//                                JSONObject single = root.getJSONObject(i);
+//                                String ticketNumber = single.getString("TICKET_NUMBER");
+//                                listOfTicket.add(ticketNumber);
+//                            }
+//                            ticketInterface.getTicket(listOfTicket);
+//                        } else {
+//                            Log.d("Network Error", "accept: Network error");
+//                            ticketInterface.error("No data found!");
+//                        }
+//                    }
+//                }, new Consumer<Throwable>() {
+//                    @Override
+//                    public void accept(Throwable throwable) throws Throwable {
+//                        ticketInterface.error(throwable.getMessage());
+//                    }
+//                }));
+//    }
+
+    //get Trailor By Retrofit:
+//    public void getTrailor(GetTicketInterface ticketInterface) {
+//        listOfTrailor.clear();
+//        trailorDisposable.add(apis.getTrailor()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Consumer<ResponseBody>() {
+//                    @Override
+//                    public void accept(ResponseBody responseBody) throws Throwable {
+//                        JSONArray root = new JSONArray(responseBody.string());
+////                            Log.d("RESPONSES", responseBody.string());
+////                            Log.d("RESPONSES",root.toString());
+//                        if (root.length() > 0) {
+//                            listOfTrailor.clear();
+//                            for (int i = 0; i < root.length(); i++) {
+//                                JSONObject single = root.getJSONObject(i);
+//                                String ticketNumber = single.getString("trailor");
+//                                listOfTrailor.add(ticketNumber);
+//                            }
+//                            ticketInterface.getTicket(listOfTrailor);
+//                        } else {
+//                            Log.d("Network Error", "accept: Network error");
+//                            ticketInterface.error("No data found!");
+//                        }
+//                    }
+//                }, new Consumer<Throwable>() {
+//                    @Override
+//                    public void accept(Throwable throwable) throws Throwable {
+//                        ticketInterface.error(throwable.getMessage());
+//                    }
+//                }));
+//    }
+
+
+    //Get ticket by Volley
     public void getTicket(GetTicketInterface ticketInterface) {
-        listOfTicket.clear();
-        ticketDisposable.add(apis.getTicket()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<ResponseBody>() {
+
+        String URL = Constant.BASE_URL + "GetTickets.php";
+        StringRequest mStringRequest = new StringRequest(
+                Request.Method.GET,
+                URL,
+                new Response.Listener<String>() {
                     @Override
-                    public void accept(ResponseBody responseBody) throws Throwable {
-                        JSONArray root = new JSONArray(responseBody.string());
-//                            Log.d("RESPONSES", responseBody.string());
-//                            Log.d("RESPONSES",root.toString());
-                        if (root.length() > 0) {
-                            listOfTicket.clear();
-                            for (int i = 0; i < root.length(); i++) {
-                                JSONObject single = root.getJSONObject(i);
-                                String ticketNumber = single.getString("TICKET_NUMBER");
-                                listOfTicket.add(ticketNumber);
+                    public void onResponse(String responseBody) {
+                        try {
+                            JSONArray root = new JSONArray(responseBody);
+                            if (root.length() > 0) {
+                                listOfTicket.clear();
+                                for (int i = 0; i < root.length(); i++) {
+                                    JSONObject single = root.getJSONObject(i);
+                                    String ticketNumber = single.getString("TICKET_NUMBER");
+                                    listOfTicket.add(ticketNumber);
+                                }
+                                ticketInterface.getTicket(listOfTicket);
+                            } else {
+                                Log.d("Network Error", "accept: Network error");
+                                ticketInterface.error("No data found!");
                             }
-                            ticketInterface.getTicket(listOfTicket);
-                        } else {
-                            Log.d("Network Error", "accept: Network error");
-                            ticketInterface.error("No data found!");
+                        } catch (Exception throwable) {
+                            ticketInterface.error(throwable.getMessage());
+                            Log.d("RESPONSE", throwable.getMessage());
                         }
                     }
-                }, new Consumer<Throwable>() {
+                },
+                new Response.ErrorListener() {
                     @Override
-                    public void accept(Throwable throwable) throws Throwable {
+                    public void onErrorResponse(VolleyError throwable) {
                         ticketInterface.error(throwable.getMessage());
+                        Log.e("TAGEEEE", "onErrorResponse: " + throwable.getMessage());
                     }
-                }));
+                }
+        );
+
+        ticketRequestQueue.add(mStringRequest);
     }
 
-    //get Ticket:
+    //get Trailor By Volley:
     public void getTrailor(GetTicketInterface ticketInterface) {
-        listOfTrailor.clear();
-        trailorDisposable.add(apis.getTrailor()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<ResponseBody>() {
+
+        String URL = Constant.BASE_URL + "GetTrailors.php";
+        StringRequest mStringRequest = new StringRequest(
+                Request.Method.GET,
+                URL,
+                new Response.Listener<String>() {
                     @Override
-                    public void accept(ResponseBody responseBody) throws Throwable {
-                        JSONArray root = new JSONArray(responseBody.string());
-//                            Log.d("RESPONSES", responseBody.string());
-//                            Log.d("RESPONSES",root.toString());
-                        if (root.length() > 0) {
-                            listOfTrailor.clear();
-                            for (int i = 0; i < root.length(); i++) {
-                                JSONObject single = root.getJSONObject(i);
-                                String ticketNumber = single.getString("trailor");
-                                listOfTrailor.add(ticketNumber);
+                    public void onResponse(String responseBody) {
+                        try {
+                            JSONArray root = new JSONArray(responseBody);
+                            if (root.length() > 0) {
+                                listOfTrailor.clear();
+                                for (int i = 0; i < root.length(); i++) {
+                                    JSONObject single = root.getJSONObject(i);
+                                    String ticketNumber = single.getString("trailor");
+                                    listOfTrailor.add(ticketNumber);
+                                }
+                                ticketInterface.getTicket(listOfTrailor);
+                            } else {
+                                Log.d("Network Error", "accept: Network error");
+                                ticketInterface.error("No data found!");
                             }
-                            ticketInterface.getTicket(listOfTrailor);
-                        } else {
-                            Log.d("Network Error", "accept: Network error");
-                            ticketInterface.error("No data found!");
+                        } catch (Exception throwable) {
+                            ticketInterface.error(throwable.getMessage());
+                            Log.d("RESPONSE", throwable.getMessage());
                         }
                     }
-                }, new Consumer<Throwable>() {
+                },
+                new Response.ErrorListener() {
                     @Override
-                    public void accept(Throwable throwable) throws Throwable {
+                    public void onErrorResponse(VolleyError throwable) {
                         ticketInterface.error(throwable.getMessage());
+                        Log.e("TAGEEEE", "onErrorResponse: " + throwable.getMessage());
                     }
-                }));
+                }
+        );
+
+        extraRequestQueue.add(mStringRequest);
     }
 }
