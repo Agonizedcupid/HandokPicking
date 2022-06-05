@@ -11,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,8 +37,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -370,16 +374,68 @@ public class PlanActivity extends AppCompatActivity implements ToLoadClick {
                     return;
                 }
 
-                long id = databaseAdapter.updatePlanToLoad(model.getDescription(), qrCode, finalQuantity, model.getStorename(), model.getLineNos(), 1);
-                if (id > 0) {
-                    recyclerView.scrollToPosition(position);
-                    Snackbar.make(snackBarLayout, "Updated To " + finalQuantity, Snackbar.LENGTH_SHORT).show();
-                    loadPlan("nothing");
+                String newNumber = null;
+                double q;
+                if (model.getQuantity().contains(",")) {
+                    newNumber = model.getQuantity().replace(",", ".");
+                    q = Double.parseDouble(newNumber);
                 } else {
-                    Snackbar.make(snackBarLayout, "Failed to update", Snackbar.LENGTH_SHORT).show();
+                    NumberFormat format = NumberFormat.getInstance(Locale.getDefault());
+                    Number number = null;
+                    try {
+                        number = format.parse(model.getQuantity());
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    assert number != null;
+                    q = number.doubleValue();
                 }
 
-                behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                Log.d("NUMBER_CHECKING", "onClick: " + q + " --- " + Double.parseDouble(finalQuantity));
+                if (Double.parseDouble(finalQuantity) > q || Double.parseDouble(finalQuantity) < q) {
+                    AlertDialog alertDialog = new AlertDialog.Builder(PlanActivity.this).create();
+                    alertDialog.setTitle("Alert Message");
+                    alertDialog.setMessage("Are you sure about the quantity you have typed in??");
+                    alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "YES", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            long id = databaseAdapter.updatePlanToLoad(model.getDescription(), qrCode, finalQuantity, model.getStorename(), model.getLineNos(), 1);
+                            if (id > 0) {
+                                recyclerView.scrollToPosition(position);
+                                Snackbar.make(snackBarLayout, "Updated To " + finalQuantity, Snackbar.LENGTH_SHORT).show();
+                                loadPlan("nothing");
+                            } else {
+                                Snackbar.make(snackBarLayout, "Failed to update", Snackbar.LENGTH_SHORT).show();
+                            }
+
+                            behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                            //finish();
+                            alertDialog.dismiss();
+                        }
+                    });
+
+                    alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "NO", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            alertDialog.dismiss();
+                        }
+                    });
+
+                    alertDialog.show();
+                } else {
+                    long id = databaseAdapter.updatePlanToLoad(model.getDescription(), qrCode, finalQuantity, model.getStorename(), model.getLineNos(), 1);
+                    if (id > 0) {
+                        recyclerView.scrollToPosition(position);
+                        Snackbar.make(snackBarLayout, "Updated To " + finalQuantity, Snackbar.LENGTH_SHORT).show();
+                        loadPlan("nothing");
+                    } else {
+                        Snackbar.make(snackBarLayout, "Failed to update", Snackbar.LENGTH_SHORT).show();
+                    }
+
+                    behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+
             }
         });
     }
